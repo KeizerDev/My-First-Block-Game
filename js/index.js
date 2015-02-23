@@ -6,8 +6,14 @@ $(function() {
 		$scoreContainer = $('<div>').addClass('score-container').appendTo('body'),
 		$speedContainer = $('<div>').addClass('speed-container').appendTo('body'),
 		$container = $('<div>').addClass('game-container').appendTo('body'),
+		$lowest, $average, $highest,
 		tempscore = 0,
-		highscore = 0,
+		clickCounter = 0,
+		score = {
+			lowest: null,
+			average: null,
+			highest: null
+		},
 		clicked = false,
 		currentSpeed = 2000,
 		timer;
@@ -37,11 +43,23 @@ $(function() {
 		};
 	}
 
-	function updateHighscore() {
-		if(tempscore >= highscore) {
-			highscore = tempscore;
-			$scoreContainer.text('highscore: ' + highscore);
+	function updateScores() {
+		if(score.lowest == null || tempscore > score.highest) {
+			score.highest = tempscore;
+			$highest.text(score.highest);
 		}
+		if(score.lowest == null || tempscore < score.lowest) {
+			score.lowest = tempscore;
+			$lowest.text(score.lowest);
+		}
+		if(score.average == null) {
+			score.average = tempscore;
+		} else {
+			score.average = Math.round(((score.average * (clickCounter-1) + tempscore) / clickCounter) * 10) / 10;
+		}
+		$average.text(score.average);
+		
+//		$scoreContainer.text((score.lowest != null ? score.lowest : '-') + ' / ' + score.average + ' / ' + score.highest);
 	}
 
 	function checkNeighbors($cell) {
@@ -86,24 +104,30 @@ $(function() {
 			event.preventDefault();
 			if(clicked) return;
 			clicked = true;
-			tempscore = 0;
+			tempscore = 1;
+			clickCounter++;
 			var $cell = $(this);
 			$cell.addClass('active');
 			checkNeighbors($cell);
-			updateHighscore();
+			updateScores();
 		});
 	}
 
 	function initRound() {
 		tempscore = 0;
-		updateHighscore();
 		resetGrid();
 		createGrid();
 		timer = setTimeout(function(){
 			initRound();
 		}, currentSpeed);
 	}
-	
+	function createScoreInterface() {
+		$lowest = $('<div>').addClass('lowest').text('-');
+		$average = $('<div>').addClass('average').text('-');
+		$highest = $('<div>').addClass('highest').text('-');
+		
+		$scoreContainer.append($lowest, $average, $highest);
+	}
 	function createSpeedInterface() {
 		var $slower = $('<div>').addClass('slower').html('&laquo');
 		var $speed = $('<div>').addClass('speed').text(currentSpeed);
@@ -123,6 +147,7 @@ $(function() {
 		});
 	}
 	createSpeedInterface();
+	createScoreInterface();
 	createHandlers();
 	initRound();
 

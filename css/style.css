@@ -10,15 +10,23 @@
 	font-family: Verdana;
 	text-align: center;
 }
-.speed-container .slower,
-.speed-container .speed,
-.speed-container .faster {
+.speed-container div,
+.score-container div {
 	display: inline-block;
 	padding: 5px;
 }
 .speed-container .slower,
 .speed-container .faster {
 	cursor: pointer;
+}
+.score-container .lowest {
+	color: red;
+}
+.score-container .average {
+	color: blue;
+}
+.score-container .highest {
+	color: green;
 }
 .cell {
 	position: absolute;
