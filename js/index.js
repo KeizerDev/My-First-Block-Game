@@ -4,10 +4,12 @@ $(function() {
 		gridHeight = 12,
 		colors = ['blue', 'green', 'pink'],
 		$scoreContainer = $('<div>').addClass('score-container').appendTo('body'),
+		$speedContainer = $('<div>').addClass('speed-container').appendTo('body'),
 		$container = $('<div>').addClass('game-container').appendTo('body'),
 		tempscore = 0,
 		highscore = 0,
 		clicked = false,
+		currentSpeed = 2000,
 		timer;
 
 	function createGrid() {
@@ -38,7 +40,7 @@ $(function() {
 	function updateHighscore() {
 		if(tempscore >= highscore) {
 			highscore = tempscore;
-			$scoreContainer.text(highscore);
+			$scoreContainer.text('highscore: ' + highscore);
 		}
 	}
 
@@ -99,8 +101,28 @@ $(function() {
 		createGrid();
 		timer = setTimeout(function(){
 			initRound();
-		}, 2000);
+		}, currentSpeed);
 	}
+	
+	function createSpeedInterface() {
+		var $slower = $('<div>').addClass('slower').html('&laquo');
+		var $speed = $('<div>').addClass('speed').text(currentSpeed);
+		var $faster = $('<div>').addClass('faster').html('&raquo');
+		
+		$speedContainer.append($slower, $speed, $faster);
+
+		$slower.click(function(){
+			if(currentSpeed >= 3000) return;
+			currentSpeed += 250;
+			$speed.text(currentSpeed);
+		});
+		$faster.click(function(){
+			if(currentSpeed <= 500) return;
+			currentSpeed -= 250;
+			$speed.text(currentSpeed);
+		});
+	}
+	createSpeedInterface();
 	createHandlers();
 	initRound();
 
