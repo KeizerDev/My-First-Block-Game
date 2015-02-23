@@ -46,16 +46,20 @@ $(function() {
 	function updateScores() {
 		if(score.lowest == null || tempscore > score.highest) {
 			score.highest = tempscore;
+			localStorage.setItem('highest', score.highest);
 			$highest.text(score.highest);
 		}
 		if(score.lowest == null || tempscore < score.lowest) {
 			score.lowest = tempscore;
+			localStorage.setItem('lowest', score.lowest);
 			$lowest.text(score.lowest);
 		}
 		if(score.average == null) {
 			score.average = tempscore;
+			localStorage.setItem('average', score.average);
 		} else {
 			score.average = Math.round(((score.average * (clickCounter-1) + tempscore) / clickCounter) * 10) / 10;
+			localStorage.setItem('average', score.average);
 		}
 		$average.text(score.average);
 		
@@ -122,9 +126,30 @@ $(function() {
 		}, currentSpeed);
 	}
 	function createScoreInterface() {
-		$lowest = $('<div>').addClass('lowest').text('-');
-		$average = $('<div>').addClass('average').text('-');
-		$highest = $('<div>').addClass('highest').text('-');
+		if(typeof(Storage) !== "undefined") {
+			if (localStorage.lowest) {
+				$lowest = $('<div>').addClass('lowest').text(localStorage.getItem('lowest'));
+			} else {
+				$lowest = $('<div>').addClass('lowest').text('-');
+			}
+
+			if (localStorage.average) {
+				$average = $('<div>').addClass('average').text(localStorage.getItem('average'));
+			} else {
+				$average = $('<div>').addClass('average').text('-');				
+			}
+
+			if (localStorage.highest) {
+				$highest = $('<div>').addClass('highest').text(localStorage.getItem('highest'));
+			} else {
+				$highest = $('<div>').addClass('highest').text('-');
+			}
+			
+		} else {
+			$lowest = $('<div>').addClass('lowest').text('-');
+			$average = $('<div>').addClass('average').text('-');
+			$highest = $('<div>').addClass('highest').text('-');	
+		}
 		
 		$scoreContainer.append($lowest, $average, $highest);
 	}
