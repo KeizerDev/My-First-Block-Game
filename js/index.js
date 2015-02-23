@@ -1,16 +1,20 @@
 $(function() {
 	var grid = [], 
-		gridWidth = 20,
-		gridHeight = 30,
-		colors = ['#F00', '#0F0', '#00F'],
-		$container = $('body').append('<div>').addClass('game-container'),
-		score = 0,
+		gridWidth = 16,
+		gridHeight = 12,
+		colors = ['blue', 'green', 'pink'],
+		$scoreContainer = $('<div>').addClass('score-container').appendTo('body'),
+		$speedContainer = $('<div>').addClass('speed-container').appendTo('body'),
+		$container = $('<div>').addClass('game-container').appendTo('body'),
+		tempscore = 0,
+		highscore = 0,
+		clicked = false,
+		currentSpeed = 2000,
 		timer;
 
 	function createGrid() {
 		var x, y;
-		
-
+		$container.css('width', gridWidth * 50);
 		for (y = 0; y < gridHeight; y++) {
 			for (x = 0; x < gridWidth; x++) {
 				cellData = {};
@@ -18,8 +22,7 @@ $(function() {
 				cellData.y = y;
 				cellData.color = colors[Math.floor(Math.random()*colors.length)];
 
-				var $cellDiv = $('<div>').addClass('cell').css({
-					backgroundColor: cellData.color,
+				var $cellDiv = $('<div>').addClass('cell ' + cellData.color).css({
 					left: x * 50,
 					top: y * 50
 				});;
@@ -34,8 +37,11 @@ $(function() {
 		};
 	}
 
-	function getScore() {
-		console.log(score);
+	function updateHighscore() {
+		if(tempscore >= highscore) {
+			highscore = tempscore;
+			$scoreContainer.text('highscore: ' + highscore);
+		}
 	}
 
 	function checkNeighbors($cell) {
@@ -63,7 +69,7 @@ $(function() {
 		var targetData = target.div.data('cellData');
 		if(!target.div.hasClass('active') && color == targetData.color) {
 			target.div.addClass('active');
-			score++;
+			tempscore++;
 			checkNeighbors(target.div);
 		}
 		
@@ -72,28 +78,51 @@ $(function() {
 	function resetGrid() {
 		grid = [];
 		$container.html('');
+		clicked = false;
 	}
 	
 	function createHandlers() {
 		$container.on('click', '.cell', function(event){
 			event.preventDefault();
+			if(clicked) return;
+			clicked = true;
+			tempscore = 0;
 			var $cell = $(this);
 			$cell.addClass('active');
-			score++;
 			checkNeighbors($cell);
-			getScore();
-			console.log('click', $cell.data('cellData'));
+			updateHighscore();
 		});
 	}
 
 	function initRound() {
+		tempscore = 0;
+		updateHighscore();
 		resetGrid();
 		createGrid();
-
 		timer = setTimeout(function(){
 			initRound();
-		}, 2000);
+		}, currentSpeed);
 	}
+	
+	function createSpeedInterface() {
+		var $slower = $('<div>').addClass('slower').html('&laquo');
+		var $speed = $('<div>').addClass('speed').text(currentSpeed);
+		var $faster = $('<div>').addClass('faster').html('&raquo');
+		
+		$speedContainer.append($slower, $speed, $faster);
+
+		$slower.click(function(){
+			if(currentSpeed >= 3000) return;
+			currentSpeed += 250;
+			$speed.text(currentSpeed);
+		});
+		$faster.click(function(){
+			if(currentSpeed <= 500) return;
+			currentSpeed -= 250;
+			$speed.text(currentSpeed);
+		});
+	}
+	createSpeedInterface();
 	createHandlers();
 	initRound();
 
