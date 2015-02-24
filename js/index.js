@@ -6,13 +6,14 @@ $(function() {
 		$scoreContainer = $('<div>').addClass('score-container').appendTo('body'),
 		$speedContainer = $('<div>').addClass('speed-container').appendTo('body'),
 		$container = $('<div>').addClass('game-container').appendTo('body'),
-		$lowest, $average, $highest,
+		$lowest, $average, $highest, $reset,
 		tempscore = 0,
-		clickCounter = 0,
 		score = {
+			tempscore: 0,
 			lowest: null,
 			average: null,
-			highest: null
+			highest: null,
+			clickCounter: 0
 		},
 		clicked = false,
 		currentSpeed = 2000,
@@ -32,7 +33,7 @@ $(function() {
 					left: x * 50,
 					top: y * 50
 				});;
-				//console.log(cellData.ran);
+
 				cellData.div = $cellDiv;
 				if(!grid[y])
 					grid[y] = [];
@@ -44,26 +45,24 @@ $(function() {
 	}
 
 	function updateScores() {
-		if(score.lowest == null || tempscore > score.highest) {
+		if(score.highest == null || tempscore > score.highest) {
 			score.highest = tempscore;
-			localStorage.setItem('highest', score.highest);
 			$highest.text(score.highest);
 		}
+
 		if(score.lowest == null || tempscore < score.lowest) {
 			score.lowest = tempscore;
-			localStorage.setItem('lowest', score.lowest);
 			$lowest.text(score.lowest);
 		}
 		if(score.average == null) {
 			score.average = tempscore;
-			localStorage.setItem('average', score.average);
 		} else {
-			score.average = Math.round(((score.average * (clickCounter-1) + tempscore) / clickCounter) * 10) / 10;
-			localStorage.setItem('average', score.average);
+			score.average = Math.round(((score.average * (score.clickCounter - 1) + tempscore) / score.clickCounter) * 10) / 10;
 		}
 		$average.text(score.average);
 		
-//		$scoreContainer.text((score.lowest != null ? score.lowest : '-') + ' / ' + score.average + ' / ' + score.highest);
+		//Store whole score object as string
+ 		localStorage.setItem('score', JSON.stringify(score));
 	}
 
 	function checkNeighbors($cell) {
@@ -94,7 +93,6 @@ $(function() {
 			tempscore++;
 			checkNeighbors(target.div);
 		}
-		
 	}
 
 	function resetGrid() {
@@ -109,7 +107,7 @@ $(function() {
 			if(clicked) return;
 			clicked = true;
 			tempscore = 1;
-			clickCounter++;
+			score.clickCounter++;
 			var $cell = $(this);
 			$cell.addClass('active');
 			checkNeighbors($cell);
@@ -126,32 +124,27 @@ $(function() {
 		}, currentSpeed);
 	}
 	function createScoreInterface() {
-		if(typeof(Storage) !== "undefined") {
-			if (localStorage.lowest) {
-				$lowest = $('<div>').addClass('lowest').text(localStorage.getItem('lowest'));
-			} else {
-				$lowest = $('<div>').addClass('lowest').text('-');
-			}
-
-			if (localStorage.average) {
-				$average = $('<div>').addClass('average').text(localStorage.getItem('average'));
-			} else {
-				$average = $('<div>').addClass('average').text('-');				
-			}
-
-			if (localStorage.highest) {
-				$highest = $('<div>').addClass('highest').text(localStorage.getItem('highest'));
-			} else {
-				$highest = $('<div>').addClass('highest').text('-');
-			}
-			
-		} else {
-			$lowest = $('<div>').addClass('lowest').text('-');
-			$average = $('<div>').addClass('average').text('-');
-			$highest = $('<div>').addClass('highest').text('-');	
-		}
+		$lowest = $('<div>').addClass('lowest').text((score.lowest ? score.lowest : '-'));
+		$average = $('<div>').addClass('average').text((score.average ? score.average : '-'));
+		$highest = $('<div>').addClass('highest').text((score.highest ? score.highest : '-'));
+		$reset = $('<div>').addClass('reset').text('reset');
 		
-		$scoreContainer.append($lowest, $average, $highest);
+		$reset.click(function(){
+			localStorage.removeItem('score');
+			score = {
+				tempscore: 0,
+				lowest: null,
+				average: null,
+				highest: null,
+				clickCounter: 0
+			}
+			tempscore = 0;
+			$lowest.text('-');
+			$average.text('-');
+			$highest.text('-');
+		});
+		
+		$scoreContainer.append($lowest, $average, $highest, $reset);
 	}
 	function createSpeedInterface() {
 		var $slower = $('<div>').addClass('slower').html('&laquo');
@@ -171,6 +164,12 @@ $(function() {
 			$speed.text(currentSpeed);
 		});
 	}
+
+	//Get score object from local storage if exists
+	if(localStorage.getItem('score') != null) {
+		score = JSON.parse(localStorage.getItem('score'));
+	}
+
 	createSpeedInterface();
 	createScoreInterface();
 	createHandlers();
