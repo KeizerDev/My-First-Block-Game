@@ -19,8 +19,8 @@ Just some blocks hangin' around...
 ```
 
 # Source
-Checkout the gh-pages branch.
+Checkout the [gh-pages](https://github.com/KeizerDev/MyFirstBlockGame/tree/gh-pages) branch.
 
 # Authors
-[@daansmit](https://github.com/daansmit)
+[@daansmit](https://github.com/daansmit) 
 [@KeizerDev](https://github.com/KeizerDev)
