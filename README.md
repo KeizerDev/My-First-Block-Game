@@ -22,5 +22,5 @@ Just some blocks hangin' around...
 Checkout the [gh-pages](https://github.com/KeizerDev/MyFirstBlockGame/tree/gh-pages) branch.
 
 # Authors
-[@daansmit](https://github.com/daansmit) 
+[@daansmit](https://github.com/daansmit)  
 [@KeizerDev](https://github.com/KeizerDev)
