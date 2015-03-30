@@ -17,3 +17,10 @@ Just some blocks hangin' around...
 |________________|
 			   
 ```
+
+# Source
+Checkout the gh-pages branch.
+
+# Authors
+[@daansmit](https://github.com/daansmit)
+[@KeizerDev](https://github.com/KeizerDev)
